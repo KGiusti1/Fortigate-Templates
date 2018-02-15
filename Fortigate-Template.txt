@@ -1,4 +1,4 @@
-
+#My Fortigate template
 
 config system global
     set admin-sport 10444
@@ -8,6 +8,7 @@ config system global
     set remoteauthtimeout 60
     set timezone 12
 
+config system interface
     edit "wan1"
         set vdom "root"
         set ip x.x.x.x 255.255.x.x
@@ -46,8 +47,6 @@ config system settings
     set gui-sslvpn-realms enable
     set gui-wireless-controller disable
     set gui-dnsfilter disable
-
-
 
 config firewall address
     edit "72.196.151.1/32"
