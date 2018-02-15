@@ -1,0 +1,147 @@
+
+
+config system global
+    set admin-sport 10444
+    set admin-ssh-port 1022
+    set admintimeout 30
+    set hostname "My-Fortigate-Name-FGT1"
+    set remoteauthtimeout 60
+    set timezone 12
+
+    edit "wan1"
+        set vdom "root"
+        set ip x.x.x.x 255.255.x.x
+        set allowaccess ping https ssh snmp
+        set type physical
+        set alias "outside"
+        set estimated-upstream-bandwidth x
+        set estimated-downstream-bandwidth x
+        set role wan
+
+    edit "Inside Interface"
+        set vdom "root"
+        set ip x.x.x.x 255.255.255.0
+        set allowaccess ping https ssh snmp
+        set type physical
+        set device-identification enable
+        set role lan
+
+config system dns
+    set primary x.x.x.x
+    set secondary x.x.x.x
+    set domain "my-domain.local"
+
+config system fortiguard
+    set service-account-id "support@wandynamics.com"
+    set sdns-server-ip "208.91.112.220" 
+
+config log fortiguard setting
+    set status enable
+
+config system settings
+    set inspection-mode proxy
+    set gui-dos-policy disable
+    set gui-local-in-policy enable
+    set gui-sslvpn-personal-bookmarks enable
+    set gui-sslvpn-realms enable
+    set gui-wireless-controller disable
+    set gui-dnsfilter disable
+
+
+
+config firewall address
+    edit "72.196.151.1/32"
+        set subnet 72.196.151.1 255.255.255.255
+    next
+    edit "207.58.205.254/32"
+        set subnet 207.58.205.254 255.255.255.255
+    next
+ end
+    config firewall addrgrp
+    edit "MGMT-Allowed"
+        set member "207.58.205.254/32" "72.196.151.1/32"
+    next
+end
+
+config firewall local-in-policy
+    edit 1
+        set intf "wan1"
+        set srcaddr "MGMT-Allowed"
+        set dstaddr "all"
+        set action accept
+        set service "ALL"
+        set schedule "always"
+    next
+    edit 2
+        set intf "wan1"
+        set srcaddr "all"
+        set dstaddr "all"
+        set action accept
+        set service "HTTPS"
+        set schedule "always"
+    next
+    edit 5
+        set intf “internal” <————update (could be internal, lan or aggregate interface)
+        set srcaddr "all"
+        set dstaddr "all"
+        set action accept
+        set service "ALL"
+        set schedule "always"
+    next
+    edit 20
+        set intf "wan1"
+        set srcaddr "all"
+        set dstaddr "all"
+        set service "ALL"
+        set schedule "always"
+    next
+
+=======================
+configure firewall VIP
+=======================
+config firewall vip
+    edit "Pubic_IP-Private_IP"
+        set comment "HWVTS5"
+        set extip Pubic_IP
+        set extintf "wan1"
+        set mappedip "Private_IP"
+
+config firewall policy
+    edit X (policy number)
+        set name "Policy Description"
+        set srcintf "wan1"
+        set dstintf "Inside LAG" (or other Internal interface)
+        set srcaddr "all"
+        set dstaddr "68.171.14.10-10.1.0.36 (VIP that was created above)
+        set action accept
+        set schedule "always"
+        set service "RDP"
+        set utm-status enable
+        set application-list "default"
+        set profile-protocol-options "default"
+
+#Configure default route:
+config router static
+    edit 1
+        set gateway 68.171.14.1
+        set device "wan1"
+    next
+
+config log setting
+    set resolve-ip enable
+    set fwpolicy-implicit-log enable
+    set local-in-deny-unicast enable
+    set local-in-deny-broadcast enable
+    set local-out enable
+
+config alertemail setting
+    set username "my-address@my-domain.com"
+    set mailto1 "support@wandynamics.com"
+    set IPS-logs enable
+    set firewall-authentication-failure-logs enable
+    set sslvpn-authentication-errors-logs enable
+    set antivirus-logs enable
+    set FDS-license-expiring-warning enable
+    set FDS-license-expiring-days 60
+
+
