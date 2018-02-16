@@ -1,0 +1,81 @@
+#Basic template for Fortigate IPSEC VPN Tunnel
+
+config firewall address
+    edit "172.16.3.0/24"
+        set subnet 172.16.3.0 255.255.255.0
+    next
+    edit "172.16.13.0/24"
+        set subnet 172.16.13.0 255.255.255.0
+    next
+    edit "10.0.0.0/8"
+        set subnet 10.0.0.0 255.0.0.0
+    next
+    edit "192.168.0.0/16"
+        set subnet 192.168.0.0 255.255.0.0
+    next
+    edit "172.16.0.0/12"
+        set subnet 172.16.0.0 255.240.0.0
+    next
+
+config firewall addrgrp
+    edit "Beachwood-L2L-VPN-Subnets"
+        set member "10.0.0.0/8" "172.16.0.0/12" "192.168.0.0/16"
+    next
+    edit "Mentor-L2L-VPN-Subnets"
+        set member "172.16.13.0/24" "172.16.3.0/24"
+    next
+
+config vpn ipsec phase1-interface
+    edit "VPN-Mentor"
+        set interface "wan1"
+        set peertype any
+        set proposal aes256-sha1
+        set comments "VPN-Mentor"
+        set dhgrp 5
+        set remote-gw 207.58.214.226
+        set psksecret mypasswd
+    next
+
+config vpn ipsec phase2-interface
+    edit "VPN-Mentor"
+        set phase1name "VPN-Mentor"
+        set proposal aes256-sha1
+        set pfs disable
+        set comments "VPN to Mentor"
+        set keylifeseconds 28800
+        set src-subnet 10.0.0.0 255.0.0.0
+        set dst-subnet 172.16.13.0 255.255.255.0
+    next
+
+config router static
+    edit x
+        set dst 172.16.13.0 255.255.255.0
+        set device "VPN-Mentor"
+    next
+
+config firewall policy
+    edit xx
+        set name "VPN Beachwood to Mentor"
+        set srcintf "Inside LAG"
+        set dstintf "VPN-Mentor"
+        set srcaddr "Beachwood-L2L-VPN-Subnets"
+        set dstaddr "Mentor-L2L-VPN-Subnets"
+        set action accept
+        set schedule "always"
+        set service "ALL"
+        set utm-status enable
+        set application-list "default"
+        set profile-protocol-options "default"
+    next
+    edit xx
+        set name "VPN Mentor to Beachwood"
+        set srcintf "VPN-Mentor"
+        set dstintf "Inside LAG"
+        set srcaddr "Mentor-L2L-VPN-Subnets"
+        set dstaddr "Beachwood-L2L-VPN-Subnets"
+        set action accept
+        set schedule "always"
+        set service "ALL"
+        set comments "VPN Mentor"
+    next
+
