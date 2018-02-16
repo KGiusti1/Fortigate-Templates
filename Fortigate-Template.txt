@@ -122,7 +122,7 @@ config firewall policy
 #Configure default route:
 config router static
     edit 1
-        set gateway 68.171.14.1
+        set gateway x.x.x.x
         set device "wan1"
     next
 

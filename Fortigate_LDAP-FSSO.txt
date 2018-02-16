@@ -1,0 +1,24 @@
+#config FSSO LDAP Polling
+
+config user fsso-polling
+    edit 1
+        set server "10.1.0.18"
+        set user "Fortigate.VPN"
+        set password mypasswd
+        set ldap-server "DC-10.1.0.18"
+        config adgrp
+            edit "OU=HWCO Users,DC=hwco,DC=com"
+            next
+        end
+    next
+    edit 2
+        set server "10.1.0.50"
+        set user "Fortigate.VPN"
+        set password mypasswd
+        set ldap-server "DC-10.1.0.50"
+        config adgrp
+            edit "OU=HWCO Users,DC=hwco,DC=com"
+            next
+        end
+    next
+end

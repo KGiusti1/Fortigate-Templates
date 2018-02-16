@@ -1,0 +1,19 @@
+#example LDAP Configuration for SSL VPN
+config user ldap
+    edit "DC-10.1.0.18"
+        set server "10.1.0.18"
+        set cnid "SAMAccountName"
+        set dn "DC=hwco,DC=com"
+        set type regular
+        set username "CN=Fortigate VPN,OU=HWCONT Special Accounts,DC=hwco,DC=com"
+        set password mypasswd
+    next
+    edit "DC-10.1.0.50"
+        set server "10.1.0.50"
+        set cnid "SAMAccountName"
+        set dn "DC=hwco,DC=com"
+        set type regular
+        set username "CN=Fortigate VPN,OU=HWCONT Special Accounts,DC=hwco,DC=com"
+        set password mypasswd
+    next
+end
