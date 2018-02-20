@@ -1,0 +1,59 @@
+Fortigate Troubleshooting Commands:
+
+#Routing
+get router info routing-table all
+get router info kernel
+show router static
+
+#Show CPU and memory info
+get system performance status
+get system performance top
+
+#Show interface stats
+diagnose hardware deviceinfo nic wan1
+
+#Show Arp for internal
+diagnose ip arp list | grep internal
+
+#Show connection count
+get system session status
+get system session-info full-stat
+
+#See the entire config
+show full-configuration
+
+#Show interface configuration
+show system interface wan1
+
+#Show logged in users
+get system info admin status
+
+#Get hardware information and model info
+get hardware status
+
+#Packet Captures:
+diag sniffer packet wan1 'tcp port 3389 or icmp' 1 5
+diag sniffer packet internal 'tcp  or icmp' 1 5
+diagnose sniffer packet internal5 icmp 1 20
+diag sniffer packet wan1 'host 72.196.150.24 or 192.168.0.1 and tcp port 3389 or icmp' 1 20
+
+#Show brief list of TCP/UDP connections:
+get system session list
+
+#Show detailed TCP/UDP connection information:
+diagnose sys session list
+
+#Clear session filters
+FGT60C3G13001331 # diagnose sys session filter clear 
+
+#Set a filter
+FGT60C3G13001331 # diagnose sys session filter src 192.168.0.15
+
+#Show the filters
+FGT60C3G13001331 # diagnose sys session filter 
+
+#Show session with your filter
+FGT60C3G13001331 # diagnose sys session list
+
+#Clear filters once again
+FGT60C3G13001331 # diagnose sys session filter clear 
